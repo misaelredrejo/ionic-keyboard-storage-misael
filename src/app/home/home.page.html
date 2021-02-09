@@ -1,0 +1,28 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title slot="primary">
+      Recordatorio de teclados
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <div class="ion-padding">
+    <ion-list>
+      <ion-item *ngFor="let keyboard of keyboards" (click)="keyboardTapped(keyboard)">
+        <ion-thumbnail slot="start">
+          <img src="{{keyboard.cover}}">
+        </ion-thumbnail>
+        <ion-label> {{keyboard.name}}</ion-label>
+      </ion-item>
+    </ion-list>
+  </div>
+</ion-content>
+<ion-toolbar>
+  <img src="https://lh3.googleusercontent.com/proxy/SGMIVYALwlOsJ9wRcJxVuxe32v-lxURnGi36tICBGQgZo-3a9Qn08kcGoBigJVvCvi0dv1P1kvTMivKVMlYyNJ0Mj3kXimj054KtYYyGPjz11G-uD5wQirJkYbiTyhiA79eAxZ8abZJAcItyiSQ" />
+  <ion-title slot="primary">
+    Desarrollo de Interfaces
+  </ion-title>
+</ion-toolbar>
