@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
-import { KeyboarddbService } from '../core/keyboarddbservice.service';
+import { KeyboardcrudService } from '../core/keyboardcrud.service';
 import { IKeyboard } from '../shared/interfaces';
 
 @Component({
@@ -18,11 +18,12 @@ export class EditPage implements OnInit {
   constructor(
     private activatedrouter: ActivatedRoute,
     private router: Router,
-    private keyboarddbService: KeyboarddbService,
+    private keyboardcrudService: KeyboardcrudService,
     public toastController: ToastController
   ) { }
 
   ngOnInit() {
+    this.id = this.activatedrouter.snapshot.params.id;
     this.keyboardForm = new FormGroup({
       name: new FormControl(''),
       category: new FormControl(''),
@@ -30,19 +31,36 @@ export class EditPage implements OnInit {
       cover: new FormControl(''),
       description: new FormControl(''),
     });
-    this.id = this.activatedrouter.snapshot.params.id;
-    this.keyboarddbService.getItem(this.id).then(
-      (data: IKeyboard) => {
-        this.keyboard = data;
+    this.keyboardcrudService.read_Keyboards().subscribe(data => {
+      let keyboards = data.map(e => {
+        return {
+          id: e.payload.doc.id,
+          isEdit: false,
+          name: e.payload.doc.data()['name'],
+          category: e.payload.doc.data()['category'],
+          price: e.payload.doc.data()['price'],
+          cover: e.payload.doc.data()['cover'],
+          description: e.payload.doc.data()['description']
+        };
+      })
+      console.log(keyboards);
+      keyboards.forEach(element => {
+          if(element.id == this.id){
+            this.keyboard = element;
 
-        this.keyboardForm = new FormGroup({
-          name: new FormControl(this.keyboard.name),
-          category: new FormControl(this.keyboard.category),
-          price: new FormControl(this.keyboard.price),
-          cover: new FormControl(this.keyboard.cover),
-          description: new FormControl(this.keyboard.description),
-        });
+        
+                this.keyboardForm = new FormGroup({
+                  name: new FormControl(this.keyboard.name),
+                  category: new FormControl(this.keyboard.category),
+                  price: new FormControl(this.keyboard.price),
+                  cover: new FormControl(this.keyboard.cover),
+                  description: new FormControl(this.keyboard.description),
+                });
+            
+          }
       });
+      });
+      
   }
 
   async onSubmit() {
@@ -55,8 +73,9 @@ export class EditPage implements OnInit {
           icon: 'save',
           text: 'ACEPTAR',
           handler: () => {
-            this.keyboarddbService.remove(this.id);
-            this.saveKeyboard();
+            this.keyboard = this.keyboardForm.value;
+            this.keyboard.id = this.id;
+            this.keyboardcrudService.update_Keyboard(this.id, this.keyboard);
             this.router.navigate(['home']);
           }
         }, {
@@ -69,12 +88,6 @@ export class EditPage implements OnInit {
       ]
     });
     toast.present();
-  }
-  saveKeyboard() {
-    this.keyboard = this.keyboardForm.value;
-    this.keyboard.id = this.id;
-    this.keyboarddbService.setItem(this.id, this.keyboard);
-    console.warn(this.keyboardForm.value);
   }
 
 }

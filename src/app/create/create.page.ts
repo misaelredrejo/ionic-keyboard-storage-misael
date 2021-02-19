@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
-import { KeyboarddbService } from '../core/keyboarddbservice.service';
+import { KeyboardcrudService } from '../core/keyboardcrud.service';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { IKeyboard } from '../shared/interfaces';
@@ -14,7 +14,7 @@ export class CreatePage implements OnInit {
   keyboardForm: FormGroup;
   constructor(
     private router: Router,
-    private keyboarddbService: KeyboarddbService,
+    private keyboardcrudService: KeyboardcrudService,
     public toastController: ToastController
   ) { }
   ngOnInit() {
@@ -54,7 +54,7 @@ export class CreatePage implements OnInit {
     this.keyboard = this.keyboardForm.value;
     let nextKey = this.keyboard.name.trim();
     this.keyboard.id = nextKey;
-    this.keyboarddbService.setItem(nextKey, this.keyboard);
+    this.keyboardcrudService.create_Keyboard(this.keyboard);
     console.warn(this.keyboardForm.value);
   }
 }

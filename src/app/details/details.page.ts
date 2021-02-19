@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { KeyboarddbService } from '../core/keyboarddbservice.service';
+import { KeyboardcrudService } from '../core/keyboardcrud.service';
 import { IKeyboard } from '../shared/interfaces';
 import { ToastController } from '@ionic/angular';
 @Component({
@@ -15,14 +15,31 @@ export class DetailsPage implements OnInit {
   constructor(
     private activatedrouter: ActivatedRoute,
     private router: Router,
-    private keyboarddbService: KeyboarddbService,
+    private keyboardcrudService: KeyboardcrudService,
     public toastController: ToastController
   ) { }
   ngOnInit() {
     this.id = this.activatedrouter.snapshot.params.id;
-    this.keyboarddbService.getItem(this.id).then(
-      (data: IKeyboard) => this.keyboard = data
-    );
+    
+    this.keyboardcrudService.read_Keyboards().subscribe(data => {
+      let keyboards = data.map(e => {
+        return {
+          id: e.payload.doc.id,
+          isEdit: false,
+          name: e.payload.doc.data()['name'],
+          category: e.payload.doc.data()['category'],
+          price: e.payload.doc.data()['price'],
+          cover: e.payload.doc.data()['cover'],
+          description: e.payload.doc.data()['description']
+        };
+      })
+      console.log(keyboards);
+      keyboards.forEach(element => {
+          if(element.id == this.id){
+            this.keyboard = element;
+          }
+      });
+    });
   }
 
   editRecord(keyboard) {
@@ -38,7 +55,7 @@ export class DetailsPage implements OnInit {
           icon: 'delete',
           text: 'ACEPTAR',
           handler: () => {
-            this.keyboarddbService.remove(id);
+            this.keyboardcrudService.delete_Keyboard(id);
             this.router.navigate(['home']);
           }
         }, {
